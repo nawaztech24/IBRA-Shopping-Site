@@ -1,8 +1,8 @@
-// SAME imports (unchanged)
 import { Button } from "@/components/ui/button";
 import bannerOne from "../../assets/banner-1.webp";
 import bannerTwo from "../../assets/banner-2.webp";
 import bannerThree from "../../assets/banner-3.webp";
+
 import {
   Airplay,
   BabyIcon,
@@ -18,21 +18,28 @@ import {
   WashingMachine,
   WatchIcon,
 } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   fetchAllFilteredProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
+
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
+
 import { useNavigate } from "react-router-dom";
+
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
+
 import { useToast } from "@/components/ui/use-toast";
+
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
+
 import { getFeatureImages } from "@/store/common-slice";
 
-// SAME data
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
   { id: "women", label: "Women", icon: CloudLightning },
@@ -56,27 +63,36 @@ function ShoppingHome() {
   const { productList, productDetails } = useSelector(
     (state) => state.shopProducts
   );
-  const { featureImageList } = useSelector((state) => state.commonFeature);
+
+  const { featureImageList } = useSelector(
+    (state) => state.commonFeature
+  );
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  //  FIXED banners
-  const banners =
-    featureImageList && featureImageList.length > 0
-      ? featureImageList.map((item) => item.image)
-      : [bannerOne, bannerTwo, bannerThree];
+  // ALL BANNERS
+  const banners = [
+    bannerOne,
+    bannerTwo,
+    bannerThree,
+    ...(featureImageList?.map((item) => item.image) || []),
+  ];
 
   function handleNavigateToListingPage(getCurrentItem, section) {
     sessionStorage.removeItem("filters");
+
     const currentFilter = {
       [section]: [getCurrentItem.id],
     };
+
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+
     navigate(`/shop/listing`);
   }
 
@@ -94,13 +110,18 @@ function ShoppingHome() {
     ).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
-        toast({ title: "Product is added to cart" });
+
+        toast({
+          title: "Product is added to cart",
+        });
       }
     });
   }
 
   useEffect(() => {
-    if (productDetails !== null) setOpenDetailsDialog(true);
+    if (productDetails !== null) {
+      setOpenDetailsDialog(true);
+    }
   }, [productDetails]);
 
   useEffect(() => {
@@ -111,7 +132,7 @@ function ShoppingHome() {
     }, 3000);
 
     return () => clearInterval(timer);
-  }, [banners]);
+  }, [banners.length]);
 
   useEffect(() => {
     dispatch(
@@ -129,15 +150,19 @@ function ShoppingHome() {
   return (
     <div className="flex flex-col min-h-screen">
 
-      {/*  BANNER */}
-      <div className="relative w-full h-[600px] overflow-hidden">
+      {/* BANNER */}
+      <div className="relative w-full h-[500px] overflow-hidden">
+
         {banners.map((slide, index) => (
           <img
-            src={slide}
             key={index}
-            className={`${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            } absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000`}
+            src={slide}
+            alt={`banner-${index}`}
+            className={`absolute top-0 left-0 w-full h-[500px] object-fill transition-opacity duration-1000 ${
+              index === currentSlide
+                ? "opacity-100"
+                : "opacity-0"
+            }`}
           />
         ))}
 
@@ -146,10 +171,11 @@ function ShoppingHome() {
           size="icon"
           onClick={() =>
             setCurrentSlide(
-              (prev) => (prev - 1 + banners.length) % banners.length
+              (prev) =>
+                (prev - 1 + banners.length) % banners.length
             )
           }
-          className="absolute top-1/2 left-4 bg-white/80"
+          className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/80 z-10"
         >
           <ChevronLeftIcon />
         </Button>
@@ -158,9 +184,11 @@ function ShoppingHome() {
           variant="outline"
           size="icon"
           onClick={() =>
-            setCurrentSlide((prev) => (prev + 1) % banners.length)
+            setCurrentSlide(
+              (prev) => (prev + 1) % banners.length
+            )
           }
-          className="absolute top-1/2 right-4 bg-white/80"
+          className="absolute top-1/2 right-4 -translate-y-1/2 bg-white/80 z-10"
         >
           <ChevronRightIcon />
         </Button>
@@ -168,57 +196,76 @@ function ShoppingHome() {
 
       {/* CATEGORY */}
       <section className="py-12 bg-gray-50">
+
         <h2 className="text-3xl font-bold text-center mb-8">
-          Shop by category
+          Shop by Category
         </h2>
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4">
+
           {categoriesWithIcon.map((item) => (
             <Card
-              onClick={() => handleNavigateToListingPage(item, "category")}
-              className="cursor-pointer"
+              key={item.id}
+              onClick={() =>
+                handleNavigateToListingPage(item, "category")
+              }
+              className="cursor-pointer hover:shadow-lg transition-all"
             >
               <CardContent className="flex flex-col items-center p-6">
                 <item.icon className="w-12 h-12 mb-4" />
-                {item.label}
+                <span>{item.label}</span>
               </CardContent>
             </Card>
           ))}
+
         </div>
       </section>
 
-      
+      {/* BRANDS */}
       <section className="py-12 bg-gray-50">
+
         <h2 className="text-3xl font-bold text-center mb-8">
           Shop by Brand
         </h2>
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 px-4">
+
           {brandsWithIcon.map((item) => (
             <Card
-              onClick={() => handleNavigateToListingPage(item, "brand")}
-              className="cursor-pointer"
+              key={item.id}
+              onClick={() =>
+                handleNavigateToListingPage(item, "brand")
+              }
+              className="cursor-pointer hover:shadow-lg transition-all"
             >
               <CardContent className="flex flex-col items-center p-6">
                 <item.icon className="w-12 h-12 mb-4" />
-                {item.label}
+                <span>{item.label}</span>
               </CardContent>
             </Card>
           ))}
+
         </div>
       </section>
 
       {/* PRODUCTS */}
       <section className="py-12">
+
         <h2 className="text-3xl font-bold text-center mb-8">
           Feature Products
         </h2>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
+
           {productList?.map((item) => (
             <ShoppingProductTile
+              key={item._id}
               product={item}
               handleGetProductDetails={handleGetProductDetails}
               handleAddtoCart={handleAddtoCart}
             />
           ))}
+
         </div>
       </section>
 

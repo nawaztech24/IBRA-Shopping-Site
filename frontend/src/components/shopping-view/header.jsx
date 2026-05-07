@@ -1,4 +1,4 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -31,6 +31,7 @@ function MenuItems() {
 
   function handleNavigate(getCurrentMenuItem) {
     sessionStorage.removeItem("filters");
+
     const currentFilter =
       getCurrentMenuItem.id !== "home" &&
       getCurrentMenuItem.id !== "products" &&
@@ -67,7 +68,9 @@ function MenuItems() {
 function HeaderRightContent() {
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
+
   const [openCartSheet, setOpenCartSheet] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -77,12 +80,11 @@ function HeaderRightContent() {
 
   useEffect(() => {
     dispatch(fetchCartItems(user?.id));
-  }, [dispatch]);
-
-  console.log(cartItems, "sangam");
+  }, [dispatch, user?.id]);
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
+
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
         <Button
           onClick={() => setOpenCartSheet(true)}
@@ -91,15 +93,20 @@ function HeaderRightContent() {
           className="relative"
         >
           <ShoppingCart className="w-6 h-6" />
+
           <span className="absolute top-[-5px] right-[2px] font-bold text-sm">
             {cartItems?.items?.length || 0}
           </span>
+
           <span className="sr-only">User cart</span>
         </Button>
+
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
           cartItems={
-            cartItems && cartItems.items && cartItems.items.length > 0
+            cartItems &&
+            cartItems.items &&
+            cartItems.items.length > 0
               ? cartItems.items
               : []
           }
@@ -110,18 +117,25 @@ function HeaderRightContent() {
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-black">
             <AvatarFallback className="bg-black text-white font-extrabold">
-              {user?.userName[0].toUpperCase()}
+              {user?.userName?.[0]?.toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
+
         <DropdownMenuContent side="right" className="w-56">
-          <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            Logged in as {user?.userName}
+          </DropdownMenuLabel>
+
           <DropdownMenuSeparator />
+
           <DropdownMenuItem onClick={() => navigate("/shop/account")}>
             <UserCog className="mr-2 h-4 w-4" />
             Account
           </DropdownMenuItem>
+
           <DropdownMenuSeparator />
+
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout
@@ -137,23 +151,39 @@ function ShoppingHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
+
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
+
         <Link to="/shop/home" className="flex items-center gap-2">
-          <HousePlug className="h-6 w-6" />
-          <span className="font-bold">Ecommerce</span>
+
+          <img
+            src="/logo.png"
+            alt="logo"
+            className="h-8 w-8 object-contain rounded-full"
+          />
+
+          <span className="font-bold text-lg">
+            IBRA
+          </span>
+
         </Link>
+
         <Sheet>
           <SheetTrigger asChild>
+
             <Button variant="outline" size="icon" className="lg:hidden">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle header menu</span>
             </Button>
+
           </SheetTrigger>
+
           <SheetContent side="left" className="w-full max-w-xs">
             <MenuItems />
             <HeaderRightContent />
           </SheetContent>
         </Sheet>
+
         <div className="hidden lg:block">
           <MenuItems />
         </div>
@@ -161,6 +191,7 @@ function ShoppingHeader() {
         <div className="hidden lg:block">
           <HeaderRightContent />
         </div>
+
       </div>
     </header>
   );
