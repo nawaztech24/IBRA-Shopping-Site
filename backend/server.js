@@ -66,7 +66,7 @@ app.use("/api/shop/review", shopReviewRouter);
 app.use("/api/common/feature", commonFeatureRouter);
 
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("Backend server is running successfully🚀");
 });
 
 
