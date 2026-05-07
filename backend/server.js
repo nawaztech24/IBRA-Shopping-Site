@@ -33,8 +33,8 @@ const PORT = process.env.PORT || 5000;
 app.use(
   cors({
     origin: [
-      "http://localhost:5173", // local
-      process.env.FRONTEND_URL || "", // deploy ke time
+      "http://localhost:5173",
+      "https://shopping-app-one-zeta.vercel.app",
     ],
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
