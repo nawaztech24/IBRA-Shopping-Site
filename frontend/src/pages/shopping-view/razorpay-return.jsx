@@ -1,13 +1,18 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { capturePayment } from "@/store/shop/order-slice";
+import { getCartItems } from "@/store/shop/cart-slice";
+
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
 import { useLocation, useNavigate } from "react-router-dom";
 
 function RazorpayReturnPage() {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const { user } = useSelector((state) => state.auth);
 
   const params = new URLSearchParams(location.search);
 
@@ -30,6 +35,8 @@ function RazorpayReturnPage() {
         if (data?.payload?.success) {
           sessionStorage.removeItem("currentOrderId");
 
+          dispatch(getCartItems(user?.id));
+
           navigate("/shop/payment-success");
         }
       });
@@ -40,6 +47,7 @@ function RazorpayReturnPage() {
     razorpay_signature,
     dispatch,
     navigate,
+    user,
   ]);
 
   return (
