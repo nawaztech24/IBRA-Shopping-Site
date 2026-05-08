@@ -1,6 +1,16 @@
-# 🛒 Full Stack MERN E-Commerce Platform
+# 🛒 IBRA - Full Stack MERN E-Commerce Platform
 
 A modern full-stack E-Commerce web application built using the MERN Stack with secure authentication, product management, cloud image uploads, cart system, online payments, and admin dashboard functionality.
+
+---
+
+# 🌐 Live Demo
+
+## Frontend Deployment
+[Visit Live Website](https://shopping-app-one-zeta.vercel.app/)
+
+## Backend API
+[Backend API](https://shopping-app-j1vl.onrender.com)
 
 ---
 
@@ -81,28 +91,26 @@ The application demonstrates:
 
 ## Frontend
 
-* React.js
-* Vite
-* Tailwind CSS
-* Redux Toolkit
-* React Router DOM
-* Axios
-* Radix UI
-* Lucide React Icons
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=react,vite,tailwind,redux,javascript,html,css" />
+</p>
+
+- React.js
+- Vite
+- Tailwind CSS
+- Redux Toolkit
 
 ---
 
 ## Backend
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT Authentication
-* bcryptjs
-* Multer
-* Cloudinary
-* Razorpay
+<p align="left">
+  <img src="https://skillicons.dev/icons?i=nodejs,express,mongodb" />
+</p>
+
+- Node.js
+- Express.js
+- MongoDB
 
 ---
 
@@ -117,7 +125,9 @@ project-root/
 │   ├── components/
 │   ├── pages/
 │   ├── store/
-│   └── config/
+│   ├── config/
+│   ├── App.jsx
+│   └── main.jsx
 │
 ├── backend/
 │   ├── controllers/
@@ -125,9 +135,13 @@ project-root/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
-│   └── server.js
+│   ├── server.js
+│   └── package.json
 │
-└── README.md
+├── screenshots/
+│
+├── README.md
+└── LICENSE
 ```
 
 ---
@@ -276,7 +290,7 @@ git clone <your-repository-url>
 ## 2️⃣ Install Frontend Dependencies
 
 ```bash
-cd client
+cd frontend
 npm install
 ```
 
@@ -285,7 +299,7 @@ npm install
 ## 3️⃣ Install Backend Dependencies
 
 ```bash
-cd server
+cd backend
 npm install
 ```
 
@@ -293,7 +307,7 @@ npm install
 
 # 🔑 Environment Variables
 
-Create a `.env` file inside server folder.
+Create a `.env` file inside backend folder.
 
 ```env
 MONGODB_URI=your_mongodb_connection
@@ -312,7 +326,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 ## Start Backend
 
 ```bash
-cd server
+cd backend
 npm run dev
 ```
 
@@ -321,7 +335,7 @@ npm run dev
 ## Start Frontend
 
 ```bash
-cd client
+cd frontend
 npm run dev
 ```
 
@@ -344,16 +358,72 @@ Possible future enhancements:
 
 ---
 
-# 📸 Screenshots
+# 📸 Below are some preview screenshots of the application interface and functionality.
 
-Add your project screenshots here:
+## 🏠 Home Hero Section
+![Home Hero Section](./screenshots/home-hero-section.png)
 
-* Home Page
-* Product Listing
-* Product Details
-* Cart Page
-* Checkout Page
-* Admin Dashboard
+---
+
+## 🛍️ Shop by Category & Brand
+![Shop Category Brand](./screenshots/shop-category-brand-section.png)
+
+---
+
+## ⭐ Featured Products
+![Featured Products](./screenshots/featured-products.png)
+
+---
+
+## 🛒 Shopping Cart Drawer
+![Shopping Cart Drawer](./screenshots/shopping-cart-drawer.png)
+
+---
+
+## 📦 Checkout Page
+![Checkout Page](./screenshots/checkout-page.png)
+
+---
+
+## 💳 Razorpay Payment Gateway
+![Razorpay Payment](./screenshots/order-successfull.png)
+
+---
+
+## ✅ Payment Success Page
+![Payment Success](./screenshots/payment-success-page.png)
+
+---
+
+## 📜 Order History
+![Order History](./screenshots/order-history-page.png)
+
+---
+
+## 📍 Address Management
+![Address Management](./screenshots/address-management.png)
+
+---
+
+## ⭐ Product Details & Reviews
+![Product Details Review](./screenshots/product-details-review.png)
+
+---
+
+# 🛠️ Admin Panel
+
+## 📊 Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+---
+
+## ➕ Add Product
+![Admin Add Product](./screenshots/admin-add-product.png)
+
+---
+
+## 📦 Admin Order Management
+![Admin Order Management](./screenshots/admin-order-management.png)
 
 ---
 
