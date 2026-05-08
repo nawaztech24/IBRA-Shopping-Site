@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { capturePayment } from "@/store/shop/order-slice";
-import { getCartItems } from "@/store/shop/cart-slice";
+import { fetchCartItems } from "@/store/shop/cart-slice";
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,7 +35,7 @@ function RazorpayReturnPage() {
         if (data?.payload?.success) {
           sessionStorage.removeItem("currentOrderId");
 
-          dispatch(getCartItems(user?.id));
+          dispatch(fetchCartItems(user?.id));
 
           navigate("/shop/payment-success");
         }
