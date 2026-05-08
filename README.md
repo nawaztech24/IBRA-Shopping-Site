@@ -1,4 +1,4 @@
-# 🛒 IBRA - Full Stack MERN E-Commerce Platform
+# 🛒 IBRA - Online Shopping Site (Full Stack MERN)
 
 A modern full-stack E-Commerce web application built using the MERN Stack with secure authentication, product management, cloud image uploads, cart system, online payments, and admin dashboard functionality.
 
