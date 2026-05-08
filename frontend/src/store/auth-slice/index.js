@@ -44,10 +44,11 @@ export const logoutUser = createAsyncThunk(
 
   async () => {
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/shop/products/get`,
+      `${import.meta.env.VITE_API_URL}/api/auth/logout`,
       {},
       {
         withCredentials: true,
+         
       }
     );
 
