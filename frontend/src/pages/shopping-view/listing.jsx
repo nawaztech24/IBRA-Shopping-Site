@@ -162,11 +162,17 @@ function ShoppingListing() {
         );
 
         if (response?.data?.success) {
+          setWishlistItems((prev) =>
+            prev.filter(
+              (item) =>
+                (item.productId?._id || item.productId)?.toString() !==
+                productId.toString()
+            )
+          );
+
           toast({
             title: "Product removed from wishlist",
           });
-
-          fetchWishlistItems();
         }
       } else {
         const response = await axios.post(
@@ -178,11 +184,18 @@ function ShoppingListing() {
         );
 
         if (response?.data?.success) {
+          setWishlistItems((prev) => [
+            ...prev,
+            {
+              productId: {
+                _id: productId,
+              },
+            },
+          ]);
+
           toast({
             title: "Product added to wishlist",
           });
-
-          fetchWishlistItems();
         }
       }
     } catch (error) {
