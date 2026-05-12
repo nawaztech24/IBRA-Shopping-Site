@@ -345,7 +345,7 @@ npm run dev
 
 Possible future enhancements:
 
-* Wishlist System
+
 * Coupon System
 * AI Product Recommendations
 * Email Notifications
