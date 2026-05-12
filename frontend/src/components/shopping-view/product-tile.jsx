@@ -18,7 +18,7 @@ function ShoppingProductTile({
           <img
             src={product?.image}
             alt={product?.title}
-           className="w-full h-[300px] object-cover object-top rounded-t-lg"
+            className="w-full h-[300px] object-cover object-top rounded-t-lg"
           />
 
           <button
@@ -26,12 +26,14 @@ function ShoppingProductTile({
               e.stopPropagation();
               handleAddToWishlist(product?._id);
             }}
-            className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
+            className={`absolute top-2 right-2 p-2 rounded-full shadow-md ${
+              isWishlisted ? "bg-red-100" : "bg-white"
+            }`}
           >
             <Heart
-              className={`w-5 h-5 ${
-              isWishlisted ? "fill-red-500 text-red-500" : ""
-               }`}
+              fill={isWishlisted ? "red" : "none"}
+              color={isWishlisted ? "red" : "black"}
+              className="w-5 h-5"
             />
           </button>
 
