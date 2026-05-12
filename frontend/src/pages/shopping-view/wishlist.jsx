@@ -8,10 +8,17 @@ import { useToast } from "@/components/ui/use-toast";
 
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 
+import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import { fetchProductDetails } from "@/store/shop/products-slice";
+
 function ShoppingWishlist() {
   const [wishlistItems, setWishlistItems] = useState([]);
 
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+
   const { user } = useSelector((state) => state.auth);
+
+  const { productDetails } = useSelector((state) => state.shopProducts);
 
   const dispatch = useDispatch();
 
@@ -74,6 +81,16 @@ function ShoppingWishlist() {
     });
   }
 
+  function handleGetProductDetails(productId) {
+    dispatch(fetchProductDetails(productId));
+  }
+
+  useEffect(() => {
+    if (productDetails !== null) {
+      setOpenDetailsDialog(true);
+    }
+  }, [productDetails]);
+
   useEffect(() => {
     if (user?.id) {
       fetchWishlistItems();
@@ -89,7 +106,13 @@ function ShoppingWishlist() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {wishlistItems.map((item) => (
-            <Card key={item?._id}>
+            <Card
+              key={item?._id}
+              className="cursor-pointer"
+              onClick={() =>
+                handleGetProductDetails(item?.productId?._id)
+              }
+            >
               <img
                 src={item?.productId?.image}
                 alt={item?.productId?.title}
@@ -110,18 +133,20 @@ function ShoppingWishlist() {
 
                 <div className="flex flex-col gap-2">
                   <Button
-                    onClick={() =>
-                      handleAddToCart(item?.productId?._id)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(item?.productId?._id);
+                    }}
                   >
                     Add to Cart
                   </Button>
 
                   <Button
                     variant="destructive"
-                    onClick={() =>
-                      handleRemoveFromWishlist(item?.productId?._id)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveFromWishlist(item?.productId?._id);
+                    }}
                   >
                     Remove
                   </Button>
@@ -131,6 +156,12 @@ function ShoppingWishlist() {
           ))}
         </div>
       )}
+
+      <ProductDetailsDialog
+        open={openDetailsDialog}
+        setOpen={setOpenDetailsDialog}
+        productDetails={productDetails}
+      />
     </div>
   );
 }
