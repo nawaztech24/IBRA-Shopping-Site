@@ -149,49 +149,51 @@ function ShoppingListing() {
   }
 
   async function handleAddToWishlist(productId) {
-  try {
-    const alreadyWishlisted = wishlistItems.some(
-      (item) => item.productId?._id === productId
-    );
-
-    if (alreadyWishlisted) {
-      const response = await axios.delete(
-        `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
+    try {
+      const alreadyWishlisted = wishlistItems.some(
+        (item) =>
+          (item.productId?._id || item.productId)?.toString() ===
+          productId.toString()
       );
 
-      if (response?.data?.success) {
-        toast({
-          title: "Product removed from wishlist",
-        });
+      if (alreadyWishlisted) {
+        const response = await axios.delete(
+          `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
+        );
 
-        fetchWishlistItems();
-      }
-    } else {
-      const response = await axios.post(
-        "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
-        {
-          userId: user?.id,
-          productId,
+        if (response?.data?.success) {
+          toast({
+            title: "Product removed from wishlist",
+          });
+
+          fetchWishlistItems();
         }
-      );
+      } else {
+        const response = await axios.post(
+          "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+          {
+            userId: user?.id,
+            productId,
+          }
+        );
 
-      if (response?.data?.success) {
-        toast({
-          title: "Product added to wishlist",
-        });
+        if (response?.data?.success) {
+          toast({
+            title: "Product added to wishlist",
+          });
 
-        fetchWishlistItems();
+          fetchWishlistItems();
+        }
       }
-    }
-  } catch (error) {
-    console.log(error);
+    } catch (error) {
+      console.log(error);
 
-    toast({
-      title: "Something went wrong",
-      variant: "destructive",
-    });
+      toast({
+        title: "Something went wrong",
+        variant: "destructive",
+      });
+    }
   }
-}
 
   useEffect(() => {
     setSort("price-lowtohigh");
@@ -282,7 +284,9 @@ function ShoppingListing() {
                   handleAddtoCart={handleAddtoCart}
                   handleAddToWishlist={handleAddToWishlist}
                   isWishlisted={wishlistItems.some(
-                    (item) => item.productId?._id === productItem?._id
+                    (item) =>
+                      (item.productId?._id || item.productId)?.toString() ===
+                      productItem?._id?.toString()
                   )}
                 />
               ))
