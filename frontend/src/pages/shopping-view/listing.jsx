@@ -149,7 +149,24 @@ function ShoppingListing() {
   }
 
   async function handleAddToWishlist(productId) {
-    try {
+  try {
+    const alreadyWishlisted = wishlistItems.some(
+      (item) => item.productId?._id === productId
+    );
+
+    if (alreadyWishlisted) {
+      const response = await axios.delete(
+        `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
+      );
+
+      if (response?.data?.success) {
+        toast({
+          title: "Product removed from wishlist",
+        });
+
+        fetchWishlistItems();
+      }
+    } else {
       const response = await axios.post(
         "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
         {
@@ -165,15 +182,16 @@ function ShoppingListing() {
 
         fetchWishlistItems();
       }
-    } catch (error) {
-      console.log(error);
-
-      toast({
-        title: "Something went wrong",
-        variant: "destructive",
-      });
     }
+  } catch (error) {
+    console.log(error);
+
+    toast({
+      title: "Something went wrong",
+      variant: "destructive",
+    });
   }
+}
 
   useEffect(() => {
     setSort("price-lowtohigh");
