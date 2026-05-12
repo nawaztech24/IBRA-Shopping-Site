@@ -22,6 +22,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 import {
   fetchAllFilteredProducts,
@@ -117,6 +118,31 @@ function ShoppingHome() {
       }
     });
   }
+
+  async function handleAddToWishlist(productId) {
+  try {
+    const response = await axios.post(
+     "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+      {
+        userId: user?.id,
+        productId,
+      }
+    );
+
+    if (response?.data?.success) {
+      toast({
+        title: "Product added to wishlist",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+
+    toast({
+      title: "Something went wrong",
+      variant: "destructive",
+    });
+  }
+}
 
   useEffect(() => {
     if (productDetails !== null) {
@@ -263,6 +289,7 @@ function ShoppingHome() {
               product={item}
               handleGetProductDetails={handleGetProductDetails}
               handleAddtoCart={handleAddtoCart}
+              handleAddToWishlist={handleAddToWishlist}
             />
           ))}
 

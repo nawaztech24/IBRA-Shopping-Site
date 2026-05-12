@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import ShoppingWishlist from "./pages/shopping-view/wishlist";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -94,6 +95,7 @@ function App() {
           <Route path="razorpay-return" element={<RazorpayReturnPage />} />
 
           <Route path="payment-success" element={<PaymentSuccessPage />} />
+          <Route path="wishlist" element={<ShoppingWishlist />} />
           <Route path="search" element={<SearchProducts />} />
         </Route>
 

@@ -1,3 +1,4 @@
+import axios from "axios";
 import ProductFilter from "@/components/shopping-view/filter";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
 import ShoppingProductTile from "@/components/shopping-view/product-tile";
@@ -103,7 +104,30 @@ function ShoppingListing() {
         }
       }
     }
+  async function handleAddToWishlist(productId) {
+  try {
+    const response = await axios.post(
+     "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+      {
+        userId: user?.id,
+        productId,
+      }
+    );
 
+    if (response?.data?.success) {
+      toast({
+        title: "Product added to wishlist",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+
+    toast({
+      title: "Something went wrong",
+      variant: "destructive",
+    });
+  }
+}
     dispatch(
       addToCart({
         userId: user?.id,
@@ -188,6 +212,7 @@ function ShoppingListing() {
                   handleGetProductDetails={handleGetProductDetails}
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
+                  handleAddToWishlist={handleAddToWishlist}
                 />
               ))
             : null}
