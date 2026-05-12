@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
-import { Heart } from "lucide-react";
+import { HeartIcon } from "lucide-react";
 
 function ShoppingProductTile({
   product,
@@ -26,13 +26,16 @@ function ShoppingProductTile({
               e.stopPropagation();
               handleAddToWishlist(product?._id);
             }}
-            className={`absolute top-2 right-2 p-2 rounded-full shadow-md ${
-              isWishlisted ? "bg-red-100" : "bg-white"
+            className={`absolute top-2 right-2 p-2 rounded-full shadow-md transition-all duration-200 ${
+              isWishlisted
+                ? "bg-red-100 border border-red-400"
+                : "bg-white"
             }`}
           >
-            <Heart
-              fill={isWishlisted ? "red" : "none"}
-              color={isWishlisted ? "red" : "black"}
+            <HeartIcon
+              strokeWidth={2.5}
+              fill={isWishlisted ? "#ef4444" : "transparent"}
+              color={isWishlisted ? "#ef4444" : "#000000"}
               className="w-5 h-5"
             />
           </button>

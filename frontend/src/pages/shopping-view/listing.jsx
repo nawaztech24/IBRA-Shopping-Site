@@ -296,10 +296,10 @@ function ShoppingListing() {
                   product={productItem}
                   handleAddtoCart={handleAddtoCart}
                   handleAddToWishlist={handleAddToWishlist}
-                  isWishlisted={wishlistItems.some(
-                    (item) =>
-                      (item.productId?._id || item.productId)?.toString() ===
-                      productItem?._id?.toString()
+                  isWishlisted={wishlistItems.find(
+                  (item) =>
+                  String(item?.productId?._id || item?.productId) ===
+                  String(productItem?._id)
                   )}
                 />
               ))
