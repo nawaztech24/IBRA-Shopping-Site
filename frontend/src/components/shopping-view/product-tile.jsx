@@ -9,6 +9,7 @@ function ShoppingProductTile({
   handleGetProductDetails,
   handleAddtoCart,
   handleAddToWishlist,
+  isWishlisted,
 }) {
   return (
     <Card className="w-full max-w-sm mx-auto">
@@ -27,7 +28,11 @@ function ShoppingProductTile({
             }}
             className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"
           >
-            <Heart className="w-5 h-5" />
+            <Heart
+              className={`w-5 h-5 ${
+              isWishlisted ? "fill-red-500 text-red-500" : ""
+               }`}
+            />
           </button>
 
           {product?.totalStock === 0 ? (
