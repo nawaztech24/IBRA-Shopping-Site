@@ -16,6 +16,7 @@ import { useSearchParams } from "react-router-dom";
 function SearchProducts() {
   const [keyword, setKeyword] = useState("");
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
   const { searchResults } = useSelector((state) => state.shopSearch);
@@ -73,20 +74,42 @@ function SearchProducts() {
       }
     });
   }
-  async function handleAddToWishlist(productId) {
+async function handleAddToWishlist(productId) {
   try {
-    const response = await axios.post(
-      "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
-      {
-        userId: user?.id,
-        productId,
-      }
+    const alreadyWishlisted = wishlistItems.find(
+      (item) =>
+        String(item?.productId?._id || item?.productId) ===
+        String(productId)
     );
 
-    if (response?.data?.success) {
-      toast({
-        title: "Product added to wishlist",
-      });
+    if (alreadyWishlisted) {
+      const response = await axios.delete(
+        `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
+      );
+
+      if (response?.data?.success) {
+        await fetchWishlistItems();
+
+        toast({
+          title: "Product removed from wishlist",
+        });
+      }
+    } else {
+      const response = await axios.post(
+        "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+        {
+          userId: user?.id,
+          productId,
+        }
+      );
+
+      if (response?.data?.success) {
+        await fetchWishlistItems();
+
+        toast({
+          title: "Product added to wishlist",
+        });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -97,6 +120,20 @@ function SearchProducts() {
     });
   }
 }
+  async function fetchWishlistItems() {
+  try {
+    const response = await axios.get(
+      `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/get/${user?.id}`
+    );
+
+    if (response?.data?.success) {
+      setWishlistItems(response.data.data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
   function handleGetProductDetails(getCurrentProductId) {
     console.log(getCurrentProductId);
     dispatch(fetchProductDetails(getCurrentProductId));
@@ -105,7 +142,11 @@ function SearchProducts() {
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
-
+  useEffect(() => {
+  if (user?.id) {
+    fetchWishlistItems();
+  }
+}, [user]);
   console.log(searchResults, "searchResults");
 
   return (
@@ -126,12 +167,20 @@ function SearchProducts() {
       ) : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {searchResults.map((item) => (
-          <ShoppingProductTile
-            handleAddtoCart={handleAddtoCart}
-            handleAddToWishlist={handleAddToWishlist}
-            product={item}
-            handleGetProductDetails={handleGetProductDetails}
-          />
+    <ShoppingProductTile
+  key={item?._id}
+  handleGetProductDetails={handleGetProductDetails}
+  product={item}
+  handleAddtoCart={handleAddtoCart}
+  handleAddToWishlist={handleAddToWishlist}
+  isWishlisted={wishlistItems.find(
+    (wishlistItem) =>
+      String(
+        wishlistItem?.productId?._id ||
+          wishlistItem?.productId
+      ) === String(item?._id)
+  )}
+/>
         ))}
       </div>
       <ProductDetailsDialog

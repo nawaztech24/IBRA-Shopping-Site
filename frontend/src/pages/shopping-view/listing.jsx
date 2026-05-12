@@ -148,65 +148,52 @@ function ShoppingListing() {
     });
   }
 
-  async function handleAddToWishlist(productId) {
-    try {
-      const alreadyWishlisted = wishlistItems.some(
-        (item) =>
-          (item.productId?._id || item.productId)?.toString() ===
-          productId.toString()
+async function handleAddToWishlist(productId) {
+  try {
+    const alreadyWishlisted = wishlistItems.find(
+      (item) =>
+        String(item?.productId?._id || item?.productId) ===
+        String(productId)
+    );
+
+    if (alreadyWishlisted) {
+      const response = await axios.delete(
+        `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
       );
 
-      if (alreadyWishlisted) {
-        const response = await axios.delete(
-          `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
-        );
+      if (response?.data?.success) {
+        await fetchWishlistItems();
 
-        if (response?.data?.success) {
-          setWishlistItems((prev) =>
-            prev.filter(
-              (item) =>
-                (item.productId?._id || item.productId)?.toString() !==
-                productId.toString()
-            )
-          );
-
-          toast({
-            title: "Product removed from wishlist",
-          });
-        }
-      } else {
-        const response = await axios.post(
-          "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
-          {
-            userId: user?.id,
-            productId,
-          }
-        );
-
-        if (response?.data?.success) {
-          setWishlistItems((prev) => [
-            ...prev,
-            {
-              productId: {
-                _id: productId,
-              },
-            },
-          ]);
-
-          toast({
-            title: "Product added to wishlist",
-          });
-        }
+        toast({
+          title: "Product removed from wishlist",
+        });
       }
-    } catch (error) {
-      console.log(error);
+    } else {
+      const response = await axios.post(
+        "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+        {
+          userId: user?.id,
+          productId,
+        }
+      );
 
-      toast({
-        title: "Something went wrong",
-        variant: "destructive",
-      });
+      if (response?.data?.success) {
+        await fetchWishlistItems();
+
+        toast({
+          title: "Product added to wishlist",
+        });
+      }
     }
+  } catch (error) {
+    console.log(error);
+
+    toast({
+      title: "Something went wrong",
+      variant: "destructive",
+    });
   }
+}
 
   useEffect(() => {
     setSort("price-lowtohigh");

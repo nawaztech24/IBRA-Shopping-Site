@@ -70,7 +70,7 @@ function ShoppingHome() {
   );
 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-
+  const [wishlistItems, setWishlistItems] = useState([]);
   const { user } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
@@ -118,21 +118,56 @@ function ShoppingHome() {
       }
     });
   }
-
-  async function handleAddToWishlist(productId) {
+async function fetchWishlistItems() {
   try {
-    const response = await axios.post(
-     "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
-      {
-        userId: user?.id,
-        productId,
-      }
+    const response = await axios.get(
+      `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/get/${user?.id}`
     );
 
     if (response?.data?.success) {
-      toast({
-        title: "Product added to wishlist",
-      });
+      setWishlistItems(response.data.data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+} 
+
+async function handleAddToWishlist(productId) {
+  try {
+    const alreadyWishlisted = wishlistItems.find(
+      (item) =>
+        String(item?.productId?._id || item?.productId) ===
+        String(productId)
+    );
+
+    if (alreadyWishlisted) {
+      const response = await axios.delete(
+        `https://shopping-app-j1vl.onrender.com/api/shop/wishlist/remove/${user?.id}/${productId}`
+      );
+
+      if (response?.data?.success) {
+        await fetchWishlistItems();
+
+        toast({
+          title: "Product removed from wishlist",
+        });
+      }
+    } else {
+      const response = await axios.post(
+        "https://shopping-app-j1vl.onrender.com/api/shop/wishlist/add",
+        {
+          userId: user?.id,
+          productId,
+        }
+      );
+
+      if (response?.data?.success) {
+        await fetchWishlistItems();
+
+        toast({
+          title: "Product added to wishlist",
+        });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -172,6 +207,11 @@ function ShoppingHome() {
   useEffect(() => {
     dispatch(getFeatureImages());
   }, [dispatch]);
+  useEffect(() => {
+  if (user?.id) {
+    fetchWishlistItems();
+  }
+}, [user]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -285,12 +325,19 @@ function ShoppingHome() {
 
           {productList?.map((item) => (
             <ShoppingProductTile
-              key={item._id}
-              product={item}
-              handleGetProductDetails={handleGetProductDetails}
-              handleAddtoCart={handleAddtoCart}
-              handleAddToWishlist={handleAddToWishlist}
-            />
+  key={item._id}
+  product={item}
+  handleGetProductDetails={handleGetProductDetails}
+  handleAddtoCart={handleAddtoCart}
+  handleAddToWishlist={handleAddToWishlist}
+  isWishlisted={wishlistItems.find(
+    (wishlistItem) =>
+      String(
+        wishlistItem?.productId?._id ||
+          wishlistItem?.productId
+      ) === String(item?._id)
+  )}
+/>
           ))}
 
         </div>

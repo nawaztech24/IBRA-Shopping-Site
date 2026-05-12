@@ -116,7 +116,7 @@ function ShoppingWishlist() {
               <img
                 src={item?.productId?.image}
                 alt={item?.productId?.title}
-                className="w-full h-[300px] object-contain bg-white rounded-t-lg"
+                className="w-full h-[300px] object-cover object-top rounded-t-lg"
               />
 
               <CardContent className="p-4">
