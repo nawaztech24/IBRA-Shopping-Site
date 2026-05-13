@@ -32,6 +32,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://shopping-app-one-zeta.vercel.app",
+      "https://ibra-shopping-site-65n7k9o6c-nawaztech24s-projects.vercel.app",
     ],
     credentials: true,
   })
