@@ -21,22 +21,25 @@ import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 
-
 import RazorpayReturnPage from "./pages/shopping-view/razorpay-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
+
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
+  if (isLoading)
+    return <Skeleton className="w-[800] bg-black h-[600px]" />;
 
   console.log(isLoading, user);
 
@@ -52,6 +55,7 @@ function App() {
             ></CheckAuth>
           }
         />
+
         <Route
           path="/auth"
           element={
@@ -91,10 +95,16 @@ function App() {
           <Route path="checkout" element={<ShoppingCheckout />} />
           <Route path="account" element={<ShoppingAccount />} />
 
-          
-          <Route path="razorpay-return" element={<RazorpayReturnPage />} />
+          <Route
+            path="razorpay-return"
+            element={<RazorpayReturnPage />}
+          />
 
-          <Route path="payment-success" element={<PaymentSuccessPage />} />
+          <Route
+            path="payment-success"
+            element={<PaymentSuccessPage />}
+          />
+
           <Route path="wishlist" element={<ShoppingWishlist />} />
           <Route path="search" element={<SearchProducts />} />
         </Route>
@@ -102,6 +112,8 @@ function App() {
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 }

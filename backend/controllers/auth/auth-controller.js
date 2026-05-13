@@ -7,12 +7,28 @@ const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
 
   try {
+    // Blank field validation
+    if (!userName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
     const checkUser = await User.findOne({ email });
 
     if (checkUser) {
-      return res.json({
+      return res.status(400).json({
         success: false,
-        message: "User Already exists with the same email! Please try again",
+        message: "User already exists with this email",
       });
     }
 
@@ -35,7 +51,7 @@ const registerUser = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Something went wrong",
     });
   }
 };
@@ -45,12 +61,20 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Blank field validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
     const checkUser = await User.findOne({ email });
 
     if (!checkUser) {
-      return res.json({
+      return res.status(400).json({
         success: false,
-        message: "User doesn't exists! Please register first",
+        message: "User does not exist! Please register first",
       });
     }
 
@@ -60,9 +84,9 @@ const loginUser = async (req, res) => {
     );
 
     if (!checkPasswordMatch) {
-      return res.json({
+      return res.status(400).json({
         success: false,
-        message: "Incorrect password! Please try again",
+        message: "Incorrect password",
       });
     }
 
@@ -98,7 +122,72 @@ const loginUser = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Something went wrong",
+    });
+  }
+};
+
+// change password
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const { oldPassword, newPassword } = req.body;
+
+    // Validation
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check old password
+    const isPasswordMatch = await bcrypt.compare(
+      oldPassword,
+      user.password
+    );
+
+    if (!isPasswordMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Old password is incorrect",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
     });
   }
 };
@@ -145,6 +234,7 @@ const authMiddleware = async (req, res, next) => {
 module.exports = {
   registerUser,
   loginUser,
+  changePassword,
   logoutUser,
   authMiddleware,
 };

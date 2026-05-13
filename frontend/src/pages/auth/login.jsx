@@ -13,20 +13,41 @@ const initialState = {
 
 function AuthLogin() {
   const [formData, setFormData] = useState(initialState);
+
   const dispatch = useDispatch();
   const { toast } = useToast();
 
   function onSubmit(event) {
     event.preventDefault();
 
+    // Blank field validation
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "All fields are required",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
+    // Password length validation
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
     dispatch(loginUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast({
-          title: data?.payload?.message,
+          title: data?.payload?.message || "Login successful",
         });
       } else {
         toast({
-          title: data?.payload?.message,
+          title: data?.payload?.message || "Invalid email or password",
           variant: "destructive",
         });
       }
@@ -39,8 +60,10 @@ function AuthLogin() {
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Sign in to your account
         </h1>
+
         <p className="mt-2">
           Don't have an account
+
           <Link
             className="font-medium ml-2 text-primary hover:underline"
             to="/auth/register"
@@ -49,6 +72,7 @@ function AuthLogin() {
           </Link>
         </p>
       </div>
+
       <CommonForm
         formControls={loginFormControls}
         buttonText={"Sign In"}

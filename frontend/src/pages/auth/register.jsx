@@ -14,21 +14,48 @@ const initialState = {
 
 function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   function onSubmit(event) {
     event.preventDefault();
+
+    // Blank field validation
+    if (
+      !formData.userName ||
+      !formData.email ||
+      !formData.password
+    ) {
+      toast({
+        title: "All fields are required",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
+    // Password validation
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
     dispatch(registerUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast({
-          title: data?.payload?.message,
+          title: data?.payload?.message || "Account created successfully",
         });
+
         navigate("/auth/login");
       } else {
         toast({
-          title: data?.payload?.message,
+          title: data?.payload?.message || "Registration failed",
           variant: "destructive",
         });
       }
@@ -43,8 +70,10 @@ function AuthRegister() {
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Create new account
         </h1>
+
         <p className="mt-2">
           Already have an account
+
           <Link
             className="font-medium ml-2 text-primary hover:underline"
             to="/auth/login"
@@ -53,6 +82,7 @@ function AuthRegister() {
           </Link>
         </p>
       </div>
+
       <CommonForm
         formControls={registerFormControls}
         buttonText={"Sign Up"}
