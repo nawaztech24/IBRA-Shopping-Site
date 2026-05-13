@@ -77,6 +77,12 @@ function ShoppingWishlist() {
         });
 
         handleRemoveFromWishlist(productId);
+      } else {
+        toast({
+          title:
+            data?.payload?.message || "Unable to add product to cart",
+          variant: "destructive",
+        });
       }
     });
   }
@@ -133,12 +139,25 @@ function ShoppingWishlist() {
 
                 <div className="flex flex-col gap-2">
                   <Button
+                    disabled={item?.productId?.totalStock === 0}
                     onClick={(e) => {
                       e.stopPropagation();
+
+                      if (item?.productId?.totalStock === 0) {
+                        toast({
+                          title: "Product is out of stock",
+                          variant: "destructive",
+                        });
+
+                        return;
+                      }
+
                       handleAddToCart(item?.productId?._id);
                     }}
                   >
-                    Add to Cart
+                    {item?.productId?.totalStock === 0
+                      ? "Out Of Stock"
+                      : "Add to Cart"}
                   </Button>
 
                   <Button
