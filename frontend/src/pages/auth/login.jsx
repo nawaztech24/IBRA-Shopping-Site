@@ -2,8 +2,11 @@ import CommonForm from "@/components/common/form";
 import { useToast } from "@/components/ui/use-toast";
 import { loginFormControls } from "@/config";
 import { loginUser } from "@/store/auth-slice";
+
 import { useState } from "react";
+
 import { useDispatch } from "react-redux";
+
 import { Link } from "react-router-dom";
 
 const initialState = {
@@ -15,6 +18,7 @@ function AuthLogin() {
   const [formData, setFormData] = useState(initialState);
 
   const dispatch = useDispatch();
+
   const { toast } = useToast();
 
   function onSubmit(event) {
@@ -47,7 +51,10 @@ function AuthLogin() {
         });
       } else {
         toast({
-          title: data?.payload?.message || "Invalid email or password",
+          title:
+            data?.payload?.message ||
+            "Invalid email or password",
+
           variant: "destructive",
         });
       }
@@ -80,6 +87,15 @@ function AuthLogin() {
         setFormData={setFormData}
         onSubmit={onSubmit}
       />
+
+      <div className="text-right">
+        <Link
+          to="/auth/forgot-password"
+          className="text-sm text-primary hover:underline"
+        >
+          Forgot Password?
+        </Link>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+const sendEmail = require("../../helpers/send-email");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
@@ -191,7 +193,139 @@ const changePassword = async (req, res) => {
     });
   }
 };
+// forgot password
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
 
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = resetToken;
+
+    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+    await user.save();
+
+    // Frontend reset URL
+    const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${resetToken}`;
+
+    // Email template
+    const message = `
+      <h2>Password Reset Request</h2>
+
+      <p>Click the button below to reset your password:</p>
+
+      <a 
+        href="${resetUrl}"
+        style="
+          display:inline-block;
+          padding:12px 20px;
+          background:black;
+          color:white;
+          text-decoration:none;
+          border-radius:5px;
+        "
+      >
+        Reset Password
+      </a>
+
+      <p>This link will expire in 15 minutes.</p>
+    `;
+
+    await sendEmail({
+      email: user.email,
+      subject: "Password Reset",
+      message,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset email sent successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+// reset password
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    user.password = hashedPassword;
+
+    user.resetPasswordToken = undefined;
+
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
 // logout
 const logoutUser = (req, res) => {
   res
@@ -237,4 +371,6 @@ module.exports = {
   changePassword,
   logoutUser,
   authMiddleware,
+  forgotPassword,
+  resetPassword,
 };
