@@ -148,7 +148,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// change password
+/// change password
 const changePassword = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -195,14 +195,32 @@ const changePassword = async (req, res) => {
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 8);
 
+    // Update password
     user.password = hashedPassword;
 
+    // Save user
     await user.save();
+
+    // Send email
+    sendEmail({
+      email: user.email,
+
+      subject: "Password Changed Successfully",
+
+      message: `
+        <h2>Password Updated ✅</h2>
+
+        <p>Your account password has been changed successfully.</p>
+
+        <p>If this was not you, please secure your account immediately.</p>
+      `,
+    });
 
     res.status(200).json({
       success: true,
       message: "Password updated successfully",
     });
+
   } catch (error) {
     console.log(error);
 
