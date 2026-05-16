@@ -193,7 +193,7 @@ const changePassword = async (req, res) => {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, 8);
 
     user.password = hashedPassword;
 
@@ -323,38 +323,44 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 8);
 
+    // update password
     user.password = hashedPassword;
 
+    // clear reset fields
     user.resetPasswordToken = undefined;
-
     user.resetPasswordExpire = undefined;
 
+    // save user
     await user.save();
+
+    // send email in background
     sendEmail({
-  email: user.email,
+      email: user.email,
 
-  subject: "Password Reset Successful",
+      subject: "Password Reset Successful",
 
-  message: `
-    <h2>Password Changed Successfully ✅</h2>
+      message: `
+        <h2>Password Changed Successfully ✅</h2>
 
-    <p>Your password has been reset successfully.</p>
+        <p>Your password has been reset successfully.</p>
 
-    <p>If this was not you, please contact support immediately.</p>
-  `,
-});
+        <p>If this was not you, please contact support immediately.</p>
+      `,
+    });
 
-    res.status(200).json({
+    // instant response
+    return res.status(200).json({
       success: true,
       message: "Password reset successful",
     });
+
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Something went wrong",
     });
