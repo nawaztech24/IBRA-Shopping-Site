@@ -1,5 +1,6 @@
 const sendEmail = require("../../helpers/send-email");
 const Order = require("../../models/Order");
+const User = require("../../models/User");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -18,6 +19,7 @@ const getAllOrdersOfAllUsers = async (req, res) => {
     });
   } catch (e) {
     console.log(e);
+
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -44,6 +46,7 @@ const getOrderDetailsForAdmin = async (req, res) => {
     });
   } catch (e) {
     console.log(e);
+
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -65,29 +68,37 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
+    const user = await User.findById(order.userId);
+
     await Order.findByIdAndUpdate(id, { orderStatus });
-    sendEmail({
-  email: order.addressInfo.email,
 
-  subject: "Order Status Updated",
+    // STATUS UPDATE EMAIL
+    if (user?.email) {
+      sendEmail({
+        email: user.email,
 
-  message: `
-    <h2>Order Update 📦</h2>
+        subject: "Order Status Updated",
 
-    <p>Your order status has been updated.</p>
+        message: `
+          <h2>Order Update 📦</h2>
 
-    <h3>Status: ${orderStatus}</h3>
+          <p>Your order status has been updated.</p>
 
-    <p>Thank you for shopping with us ❤️</p>
-    `,
-});
+          <h3>Status: ${orderStatus}</h3>
+
+          <p>Thank you for shopping with us ❤️</p>
+        `,
+      });
+    }
 
     res.status(200).json({
       success: true,
       message: "Order status is updated successfully!",
     });
+
   } catch (e) {
     console.log(e);
+
     res.status(500).json({
       success: false,
       message: "Some error occured!",

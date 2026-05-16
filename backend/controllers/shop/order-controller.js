@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
+const User = require("../../models/User");
 
 
 const createOrder = async (req, res) => {
@@ -93,14 +94,23 @@ const capturePayment = async (req, res) => {
     console.log("Generated:", expectedSignature);
     console.log("Received:", razorpay_signature);
 
+    let order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    const user = await User.findById(order.userId);
+
     // PAYMENT FAILED
     if (expectedSignature !== razorpay_signature) {
 
-      let failedOrder = await Order.findById(orderId);
-
-      if (failedOrder?.addressInfo?.email) {
+      if (user?.email) {
         sendEmail({
-          email: failedOrder.addressInfo.email,
+          email: user.email,
 
           subject: "Payment Failed",
 
@@ -117,15 +127,6 @@ const capturePayment = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Payment verification failed",
-      });
-    }
-
-    let order = await Order.findById(orderId);
-
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Order not found",
       });
     }
 
@@ -147,23 +148,26 @@ const capturePayment = async (req, res) => {
 
     await order.save();
 
-    sendEmail({
-      email: order.addressInfo.email,
+    // SUCCESS EMAIL
+    if (user?.email) {
+      sendEmail({
+        email: user.email,
 
-      subject: "Order Placed Successfully",
+        subject: "Order Placed Successfully",
 
-      message: `
-        <h2>Order Confirmed ✅</h2>
+        message: `
+          <h2>Order Confirmed ✅</h2>
 
-        <p>Your payment was successful.</p>
+          <p>Your payment was successful.</p>
 
-        <p>Your order has been placed successfully.</p>
+          <p>Your order has been placed successfully.</p>
 
-        <p>Total Amount: ₹${order.totalAmount}</p>
+          <p>Total Amount: ₹${order.totalAmount}</p>
 
-        <p>Thank you for shopping with us ❤️</p>
-      `,
-    });
+          <p>Thank you for shopping with us ❤️</p>
+        `,
+      });
+    }
 
     res.status(200).json({
       success: true,
