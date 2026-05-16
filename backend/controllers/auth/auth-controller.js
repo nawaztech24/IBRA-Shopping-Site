@@ -194,8 +194,10 @@ const changePassword = async (req, res) => {
   }
 };
 // forgot password
+
 const forgotPassword = async (req, res) => {
   try {
+    console.log("FORGOT PASSWORD API HIT");
     const { email } = req.body;
 
     if (!email) {
