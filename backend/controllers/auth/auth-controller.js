@@ -251,7 +251,7 @@ const forgotPassword = async (req, res) => {
       <p>This link will expire in 15 minutes.</p>
     `;
 
-    await sendEmail({
+    sendEmail({
       email: user.email,
       subject: "Password Reset",
       message,
