@@ -3,20 +3,16 @@ const nodemailer = require("nodemailer");
 const sendEmail = async (options) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp-relay.brevo.com",
+      port: 587,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.BREVO_EMAIL,
+        pass: process.env.BREVO_SMTP_KEY,
       },
     });
 
-    // verify transporter
-    await transporter.verify();
-
-    console.log("Transporter verified");
-
     const info = await transporter.sendMail({
-      from: `"E-Commerce Online Shopping Site" <${process.env.EMAIL_USER}>`,
+     from: '"E-Commerce Online Shopping Site" <khanmohdnawaz567@gmail.com>',
       to: options.email,
       subject: options.subject,
       html: options.message,
