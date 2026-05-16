@@ -1,6 +1,6 @@
 const razorpay = require("../../helpers/razorpay");
+const sendEmail = require("../../helpers/send-email");
 const crypto = require("crypto");
-
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
@@ -65,7 +65,7 @@ const createOrder = async (req, res) => {
 
 const capturePayment = async (req, res) => {
   try {
-    
+
     const {
       razorpay_payment_id,
       razorpay_order_id,
@@ -83,7 +83,6 @@ const capturePayment = async (req, res) => {
       });
     }
 
-    
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -94,8 +93,27 @@ const capturePayment = async (req, res) => {
     console.log("Generated:", expectedSignature);
     console.log("Received:", razorpay_signature);
 
-   
+    // PAYMENT FAILED
     if (expectedSignature !== razorpay_signature) {
+
+      let failedOrder = await Order.findById(orderId);
+
+      if (failedOrder?.addressInfo?.email) {
+        sendEmail({
+          email: failedOrder.addressInfo.email,
+
+          subject: "Payment Failed",
+
+          message: `
+            <h2>Payment Failed ❌</h2>
+
+            <p>Your payment could not be completed.</p>
+
+            <p>Please try again.</p>
+          `,
+        });
+      }
+
       return res.status(400).json({
         success: false,
         message: "Payment verification failed",
@@ -111,6 +129,7 @@ const capturePayment = async (req, res) => {
       });
     }
 
+    // PAYMENT SUCCESS
     order.paymentStatus = "paid";
     order.orderStatus = "confirmed";
     order.paymentId = razorpay_payment_id;
@@ -128,6 +147,24 @@ const capturePayment = async (req, res) => {
 
     await order.save();
 
+    sendEmail({
+      email: order.addressInfo.email,
+
+      subject: "Order Placed Successfully",
+
+      message: `
+        <h2>Order Confirmed ✅</h2>
+
+        <p>Your payment was successful.</p>
+
+        <p>Your order has been placed successfully.</p>
+
+        <p>Total Amount: ₹${order.totalAmount}</p>
+
+        <p>Thank you for shopping with us ❤️</p>
+      `,
+    });
+
     res.status(200).json({
       success: true,
       message: "Payment successful",
@@ -136,13 +173,13 @@ const capturePayment = async (req, res) => {
 
   } catch (e) {
     console.log(e);
+
     res.status(500).json({
       success: false,
       message: "Payment failed",
     });
   }
 };
-
 
 const getAllOrdersByUser = async (req, res) => {
   try {

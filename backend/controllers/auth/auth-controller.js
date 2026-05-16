@@ -42,12 +42,31 @@ const registerUser = async (req, res) => {
       password: hashPassword,
     });
 
+  
+
+
     await newUser.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Registration successful",
-    });
+sendEmail({
+  email: newUser.email,
+
+  subject: "Welcome to E-Commerce Online Shopping Site",
+
+  message: `
+    <h2>Welcome ${newUser.userName} 🎉🎈</h2>
+
+    <p>Your account has been created successfully.</p>
+
+    <p>Thank you for joining our E-Commerce Online Shopping Site.</p>
+  `,
+});
+
+res.status(200).json({
+  success: true,
+  message: "Registration successful",
+});
+
+    
   } catch (e) {
     console.log(e);
 
@@ -314,6 +333,19 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpire = undefined;
 
     await user.save();
+    sendEmail({
+  email: user.email,
+
+  subject: "Password Reset Successful",
+
+  message: `
+    <h2>Password Changed Successfully ✅</h2>
+
+    <p>Your password has been reset successfully.</p>
+
+    <p>If this was not you, please contact support immediately.</p>
+  `,
+});
 
     res.status(200).json({
       success: true,

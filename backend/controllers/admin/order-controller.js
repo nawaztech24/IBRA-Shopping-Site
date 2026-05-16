@@ -1,3 +1,4 @@
+const sendEmail = require("../../helpers/send-email");
 const Order = require("../../models/Order");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
@@ -65,6 +66,21 @@ const updateOrderStatus = async (req, res) => {
     }
 
     await Order.findByIdAndUpdate(id, { orderStatus });
+    sendEmail({
+  email: order.addressInfo.email,
+
+  subject: "Order Status Updated",
+
+  message: `
+    <h2>Order Update 📦</h2>
+
+    <p>Your order status has been updated.</p>
+
+    <h3>Status: ${orderStatus}</h3>
+
+    <p>Thank you for shopping with us ❤️</p>
+    `,
+});
 
     res.status(200).json({
       success: true,
